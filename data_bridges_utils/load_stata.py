@@ -29,14 +29,22 @@ def load_stata(df, stata_path="C:/Program Files/Stata18", stata_version="se", va
         try:
             if variable_labels and varname in variable_labels:
                 Data.setVarLabel(varname, variable_labels[varname])
+        except ValueError as e:
+            print(f"Error: {e}. Skipping variable {varname}.")
+            continue
 
+        try:
             if value_labels and varname in value_labels:
                 value_label_name = f"{varname}_value_label"
                 ValueLabel.createLabel(value_label_name)
                 for value, label in value_labels[varname].items():
                     ValueLabel.setLabelValue(value_label_name, value, label)
                 ValueLabel.setVarValueLabel(varname, value_label_name)
+        except ValueError as e:
+            print(f"Error: {e}. Skipping variable {varname}.")
+            continue
 
+        try:
             if dtype == "int64":
                 Data.addVarInt(varname)
                 Data.store(varname, None, varval)
