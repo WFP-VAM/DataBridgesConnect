@@ -26,37 +26,37 @@ def load_stata(df, stata_path="C:/Program Files/Stata18", stata_version="se", va
         varname = SFIToolkit.makeVarName(colnames[i], retainCase=True)
         varval = df[colnames[i]].values.tolist()
 
-        if variable_labels and varname in variable_labels:
-            Data.setVarLabel(varname, variable_labels[varname])
+        try:
+            if variable_labels and varname in variable_labels:
+                Data.setVarLabel(varname, variable_labels[varname])
 
-        if value_labels and varname in value_labels:
-            value_label_name = f"{varname}_value_label"
-            ValueLabel.createLabel(value_label_name)
-            for value, label in value_labels[varname].items():
-                ValueLabel.setLabelValue(value_label_name, value, label)
-            ValueLabel.setVarValueLabel(varname, value_label_name)
+            if value_labels and varname in value_labels:
+                value_label_name = f"{varname}_value_label"
+                ValueLabel.createLabel(value_label_name)
+                for value, label in value_labels[varname].items():
+                    ValueLabel.setLabelValue(value_label_name, value, label)
+                ValueLabel.setVarValueLabel(varname, value_label_name)
 
-        if dtype == "int64":
-            Data.addVarInt(varname)
-            Data.store(varname, None, varval)
-        elif dtype == "float64":
-            Data.addVarDouble(varname)
-            Data.store(varname, None, varval)
-        elif dtype == "bool":
-            Data.addVarByte(varname)
-            Data.store(varname, None, varval)
-        elif dtype == "datetime64[ns]":
-            Data.addVarFloat(varname)
-            price_dt_py = [dt.getSIF(j, '%tdCCYY-NN-DD') for j in df[colnames[i]]]
-            Data.store(varname, None, price_dt_py)
-            Data.setVarFormat(varname, '%tdCCYY-NN-DD')
-        else:
-            Data.addVarStr(varname, 1)
-            s = [str(i) for i in varval]
-            Data.store(varname, None, s)
+            if dtype == "int64":
+                Data.addVarInt(varname)
+                Data.store(varname, None, varval)
+            elif dtype == "float64":
+                Data.addVarDouble(varname)
+                Data.store(varname, None, varval)
+            elif dtype == "bool":
+                Data.addVarByte(varname)
+                Data.store(varname, None, varval)
+            elif dtype == "datetime64[ns]":
+                Data.addVarFloat(varname)
+                price_dt_py = [dt.getSIF(j, '%tdCCYY-NN-DD') for j in df[colnames[i]]]
+                Data.store(varname, None, price_dt_py)
+                Data.setVarFormat(varname, '%tdCCYY-NN-DD')
+            else:
+                Data.addVarStr(varname, 1)
+                s = [str(i) for i in varval]
+                Data.store(varname, None, s)
+
+        except ValueError as e:
+            print(f"Error: {e}. Skipping variable {varname}.")
 
     return df
-
-
-if __name__ == "__main__":
-    pass
