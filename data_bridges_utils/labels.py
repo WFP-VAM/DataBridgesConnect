@@ -16,6 +16,20 @@ def get_value_labels(df):
             categories_dict[name] = {int(choice["name"]): choice["label"]}
     return categories_dict
 
+def get_stata_variable_labels(df):
+    labels_dict = {}
+
+    for _, row in df.iterrows():
+        name = row["name"]
+        label = row["label"]
+        if name in labels_dict:
+            labels_dict[name].update(label)
+        elif label == "":
+            labels_dict[name] = name
+        else:
+            labels_dict[name] = label
+    return labels_dict
+
 def get_column_labels(df):
     labels_dict = {}
 
